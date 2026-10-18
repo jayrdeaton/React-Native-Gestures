@@ -1,0 +1,97 @@
+{
+  "name": "@rific/gestures",
+  "version": "0.1.0",
+  "description": "Shared gestures for React Native apps: SwipeToDismiss, a view swiped or flicked away sideways (or off an edge) that follows the finger, measured in its own coordinates",
+  "keywords": [
+    "react-native",
+    "gesture",
+    "swipe",
+    "swipe-to-dismiss",
+    "swipe-to-delete",
+    "flick",
+    "reanimated",
+    "gesture-handler"
+  ],
+  "homepage": "https://github.com/jayrdeaton/react-native-gestures#readme",
+  "bugs": {
+    "url": "https://github.com/jayrdeaton/react-native-gestures/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jayrdeaton/react-native-gestures.git"
+  },
+  "license": "MIT",
+  "author": "Jay Deaton",
+  "sideEffects": false,
+  "type": "commonjs",
+  "exports": {
+    ".": {
+      "react-native": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "react-native": "src/index.ts",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "!src/__tests__",
+    "!src/__mocks__"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch",
+    "fix": "eslint --fix",
+    "lint": "eslint",
+    "prepublishOnly": "npm run build",
+    "release": "git push --follow-tags",
+    "release:major": "npm version major && npm run release",
+    "release:minor": "npm version minor && npm run release",
+    "release:patch": "npm version patch && npm run release",
+    "test": "jest",
+    "test:watch": "jest --watchAll",
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run lint && npm test && npm run typecheck && npm run build",
+    "preversion": "npm run verify"
+  },
+  "prettier": "@infinitetoken/eslint-config/prettier",
+  "devDependencies": {
+    "@infinitetoken/eslint-config": "0.2.1",
+    "@infinitetoken/jest-config": "^0.5.2",
+    "@infinitetoken/tsconfig": "^0.6.0",
+    "@rific/core": "^0.5.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/jest": "^30.0.0",
+    "@types/react": "^19.0.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-native": "^5.0.0",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
+    "prettier": "^3.8.3",
+    "react": "^19.2.6",
+    "react-dom": "^19.0.0",
+    "react-native": "^0.88.0",
+    "react-native-gesture-handler": "^3.4.0",
+    "react-native-reanimated": "^4.7.1",
+    "react-native-worklets": "^0.13.0",
+    "tsup": "^8.0.0",
+    "typescript": "^6.0.3"
+  },
+  "peerDependencies": {
+    "@rific/core": ">=0.5.0",
+    "react": ">=19.0.0",
+    "react-native": ">=0.76.0",
+    "react-native-gesture-handler": ">=2.0.0 <4.0.0",
+    "react-native-reanimated": ">=4.0.0",
+    "react-native-worklets": ">=0.5.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

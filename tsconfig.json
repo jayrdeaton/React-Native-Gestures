@@ -1,0 +1,5 @@
+{
+  "extends": "@infinitetoken/tsconfig/react-native",
+  "include": ["src"],
+  "exclude": ["src/__mocks__"]
+}
