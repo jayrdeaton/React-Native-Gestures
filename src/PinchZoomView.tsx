@@ -54,9 +54,10 @@ export function PinchZoomView({ children, contentHeight, contentWidth, maxScale,
   const viewportRef = useRef<View>(null)
   useSwallowClick(viewportRef, swallowClick)
 
-  const zoomStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }, { translateY: translateY.value }, { scale: scale.value }]
-  }))
+  const zoomStyle = useAnimatedStyle(() => {
+    'worklet'
+    return { transform: [{ translateX: translateX.value }, { translateY: translateY.value }, { scale: scale.value }] }
+  })
 
   return (
     <GestureDetector gesture={gesture}>

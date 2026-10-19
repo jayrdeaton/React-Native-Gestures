@@ -59,7 +59,10 @@ export type SwipeToDismissProps = {
 // no such step, and the browser's `click` at pointer-up is what react-native-web presses on, so a pan that activated marks the touch
 // (`swallowClick`) and the wrapper eats the click that follows (see SwipeToDismiss). Found in Hangman's web preview (2026-10-18): a seat
 // flicked away was pressed on its way out, which focused it first.
-// `clearance` is how far the exit target must reach to leave the screen whatever the view's size (see swipeExitTarget).
+// `clearance` is how far the exit target must reach to leave the screen whatever the view's size (see swipeExitTarget). (5) Every callback
+// handed to a Reanimated hook says 'worklet' itself: the worklets Babel plugin only spots a hook's callback by the hook's own name, and the
+// bundled dist the web loads can rename it (two files importing useAnimatedStyle became useAnimatedStyle2 in 0.1.1, so SwipeToDismiss's
+// style never became a worklet and threw on every web page). See hookWorklets.test.ts.
 type SwipeState = {
   beginX: SharedValue<number>
   beginY: SharedValue<number>
@@ -191,8 +194,12 @@ export function SwipeToDismiss({ children, edge, onDismiss, ref, style, testID }
   const handleDismiss = useCallback(() => onDismiss?.(), [onDismiss])
   const dismissKey = useWorkletCallback(handleDismiss)
   useAnimatedReaction(
-    () => dismissed.value,
+    () => {
+      'worklet'
+      return dismissed.value
+    },
     (isDismissed, wasDismissed) => {
+      'worklet'
       if (isDismissed && !wasDismissed) scheduleOnRN(callWorkletCallback, dismissKey)
     }
   )
@@ -220,15 +227,16 @@ export function SwipeToDismiss({ children, edge, onDismiss, ref, style, testID }
 
   // Fades to 0.4 as the drag nears the distance that dismisses it, whichever way it goes.
   const opacity = useDerivedValue(() => {
+    'worklet'
     if (width <= 0 || height <= 0) return 1
     const progress = Math.max(Math.abs(translateX.value) / (width * SWIPE_DISMISS_FRACTION), edgeSign === 0 ? 0 : Math.max(0, translateY.value * edgeSign) / (height * SWIPE_EDGE_DISMISS_FRACTION))
     return interpolate(progress, [0, 1], [1, 0.4], Extrapolation.CLAMP)
   })
 
-  const swipeStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateX: translateX.value }, { translateY: translateY.value }]
-  }))
+  const swipeStyle = useAnimatedStyle(() => {
+    'worklet'
+    return { opacity: opacity.value, transform: [{ translateX: translateX.value }, { translateY: translateY.value }] }
+  })
 
   return (
     <GestureDetector gesture={gesture} touchAction={edgeSign === 0 ? 'pan-y' : 'none'}>

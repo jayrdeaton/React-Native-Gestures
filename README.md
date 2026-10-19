@@ -2,6 +2,8 @@
 
 Shared gestures for React Native apps, so every swipe and pinch in the fleet feels the same.
 
+**[Live demo](https://rific.jaydeaton.com/demos/gestures)**: A swipe works with a mouse on the web, but a pinch needs a touch screen, so pinch-to-zoom needs a phone or tablet.
+
 ## SwipeToDismiss
 
 Content the player swipes away: a toast, a list row, a player's seat. It follows the finger, fades toward 40% as it nears the distance that dismisses it, springs back when let go short, and otherwise flies off the screen and calls `onDismiss`.
