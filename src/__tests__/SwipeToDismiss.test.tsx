@@ -270,6 +270,32 @@ describe('SwipeToDismiss', () => {
       act(() => screen.getByText('Press me').click())
       expect(onPress).toHaveBeenCalledTimes(2)
     })
+
+    // react-native-web can lose the first layout of a view mounted through Expo Router, so the wrapper is measured directly two frames after
+    // mount (useOwnSize, whose own tests cover the rest).
+    it('measures its wrapper when the first layout never arrives', () => {
+      const frames: FrameRequestCallback[] = []
+      const raf = jest.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => frames.push(callback))
+      const onDismiss = jest.fn()
+      render(
+        <SwipeToDismiss onDismiss={onDismiss} testID='swipe'>
+          <span>Content</span>
+        </SwipeToDismiss>
+      )
+      const wrapper = screen.getByTestId('swipe')
+      Object.defineProperty(wrapper, 'offsetWidth', { configurable: true, value: 300 })
+      Object.defineProperty(wrapper, 'offsetHeight', { configurable: true, value: 50 })
+      expect(lastPanConfig.enabled).toBe(false)
+      act(() => {
+        while (frames.length) frames.shift()?.(0)
+      })
+      raf.mockRestore()
+      expect(lastPanConfig.enabled).toBe(true)
+      swipe(0, 85) // short of 30% of 300
+      expect(onDismiss).not.toHaveBeenCalled()
+      swipe(0, 95)
+      expect(onDismiss).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('once dismissed', () => {

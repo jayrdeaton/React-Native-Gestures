@@ -1,12 +1,13 @@
 import { callWorkletCallback, useWorkletCallback } from '@rific/core'
-import { type ReactNode, type Ref, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { type LayoutChangeEvent, type StyleProp, useWindowDimensions, View, type ViewStyle } from 'react-native'
+import { type ReactNode, type Ref, useCallback, useImperativeHandle, useMemo } from 'react'
+import { type StyleProp, useWindowDimensions, View, type ViewStyle } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { Extrapolation, interpolate, type SharedValue, useAnimatedReaction, useAnimatedStyle, useDerivedValue, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 
 import { useSwallowClick } from './swallowClick'
 import { releaseVelocity, sampleVelocity, SWIPE_DISMISS_FRACTION, SWIPE_EDGE_DISMISS_FRACTION, swipeEdgeDrag, swipeExitTarget, swipeIsVertical, swipeShouldDismiss } from './swipe'
+import { useOwnSize } from './useOwnSize'
 
 /** How far a sideways-only swipe has to move sideways before it takes the touch, and how far up or down before it gives the touch up to a
  * scroll view around it instead. */
@@ -171,8 +172,9 @@ function buildSwipeGesture(swipe: SwipeState, enabled: boolean, width: number, h
 export function SwipeToDismiss({ children, edge, onDismiss, ref, style, testID }: SwipeToDismissProps) {
   const swipe = useSwipeState()
   const { dismissed, gone, swallowClick, translateX, translateY } = swipe
-  // The view's own size: the reference for the dismiss distances and the exit target. The swipe waits for the first layout.
-  const [size, setSize] = useState<{ height: number; width: number } | null>(null)
+  // The stationary wrapper's own size: the reference for the dismiss distances and the exit target. The swipe waits for it (on the web, measured
+  // directly if react-native-web loses the first layout: see useOwnSize).
+  const { onLayout: handleLayout, ref: wrapperRef, size } = useOwnSize()
   const width = size?.width ?? 0
   const height = size?.height ?? 0
   const edgeSign = edge === 'top' ? -1 : edge === 'bottom' ? 1 : 0
@@ -181,11 +183,6 @@ export function SwipeToDismiss({ children, edge, onDismiss, ref, style, testID }
   const { height: windowHeight, width: windowWidth } = useWindowDimensions()
   const clearance = Math.max(width, windowWidth, windowHeight)
   const enabled = onDismiss !== undefined && size !== null
-
-  const handleLayout = useCallback((e: LayoutChangeEvent) => {
-    const { height: laidOutHeight, width: laidOutWidth } = e.nativeEvent.layout
-    if (laidOutWidth > 0) setSize((prev) => (prev && prev.width === laidOutWidth && prev.height === laidOutHeight ? prev : { height: laidOutHeight, width: laidOutWidth }))
-  }, [])
 
   // The completion of the fly-out is signalled through a shared value and acted on here, so scheduleOnRN is called from a worklet declared in
   // the component body rather than one made inside another callback. The reaction is held by this component, so it must not hand
@@ -218,7 +215,6 @@ export function SwipeToDismiss({ children, edge, onDismiss, ref, style, testID }
   )
 
   // On the web, the click that follows a swipe (pointer-up) is caught on its way down to the content and stopped (see swallowClick.ts).
-  const wrapperRef = useRef<View>(null)
   useSwallowClick(wrapperRef, swallowClick)
 
   // The swipe's state is stable, so the gesture is only rebuilt when the view's size, edge, clearance or whether it's on changes, never as a

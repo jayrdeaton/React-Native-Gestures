@@ -1,9 +1,10 @@
-import { type ReactNode, type Ref, useCallback, useImperativeHandle, useRef, useState } from 'react'
-import { type LayoutChangeEvent, type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native'
+import { type ReactNode, type Ref, useImperativeHandle } from 'react'
+import { type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native'
 import { GestureDetector } from 'react-native-gesture-handler'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 
 import { useSwallowClick } from './swallowClick'
+import { useOwnSize } from './useOwnSize'
 import { usePinchZoomState } from './usePinchZoom'
 
 /** What a `ref` to a PinchZoomView can do. */
@@ -38,20 +39,15 @@ export type PinchZoomViewProps = {
  * screen reader, so anything only visible zoomed in needs another way to it.
  */
 export function PinchZoomView({ children, contentHeight, contentWidth, maxScale, minScale, ref, style, testID }: PinchZoomViewProps) {
-  // The view's own size: the viewport the bounds are measured against. Nothing zooms until the first layout.
-  const [size, setSize] = useState<{ height: number; width: number } | null>(null)
+  // The stationary viewport's own size: what the bounds are measured against. Nothing zooms until it has one (on the web, measured directly if
+  // react-native-web loses the first layout: see useOwnSize).
+  const { onLayout: handleLayout, ref: viewportRef, size } = useOwnSize()
   const { swallowClick, zoom } = usePinchZoomState({ contentHeight, contentWidth, height: size?.height ?? 0, maxScale, minScale, width: size?.width ?? 0 })
   const { gesture, reset, scale, translateX, translateY } = zoom
-
-  const handleLayout = useCallback((e: LayoutChangeEvent) => {
-    const { height, width } = e.nativeEvent.layout
-    if (width > 0 && height > 0) setSize((prev) => (prev && prev.width === width && prev.height === height ? prev : { height, width }))
-  }, [])
 
   useImperativeHandle(ref, () => ({ reset }), [reset])
 
   // On the web, the click that follows a pan or a pinch is caught on its way down to the content and stopped (see swallowClick.ts).
-  const viewportRef = useRef<View>(null)
   useSwallowClick(viewportRef, swallowClick)
 
   const zoomStyle = useAnimatedStyle(() => {

@@ -45,6 +45,8 @@ swipe.current?.restore()
 | `style` | `StyleProp<ViewStyle>` | The stationary wrapper's style. It never moves; only the content inside follows the finger. |
 | `testID` | `string` | On the stationary wrapper. |
 
+It sizes itself from its own layout, so the swipe comes on once the view is laid out (on the web, a view whose first layout never arrives measures itself two frames after mount).
+
 The content stays mounted after `onDismiss` until the app removes it (usually at once, with a layout animation closing the gap). Until then, or until `restore()`, a touch on the empty spot does nothing.
 
 A swipe can't be reached by a screen reader, so keep another way to do the same thing (a delete button, an accessibility action).
@@ -95,6 +97,8 @@ zoom.current?.reset()
 | `testID` | `string` | On the stationary view. |
 
 Pressables inside the content keep working: a pan or a pinch cancels the press it started on (on the web too).
+
+Like SwipeToDismiss, it zooms once the view is laid out, and on the web measures itself two frames after mount if its first layout never arrives.
 
 ### usePinchZoom
 

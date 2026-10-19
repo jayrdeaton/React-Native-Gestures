@@ -143,5 +143,26 @@ describe('PinchZoomView', () => {
       click()
       expect(onPress).toHaveBeenCalledTimes(2)
     })
+
+    // react-native-web can lose the first layout of a view mounted through Expo Router, so the viewport is measured directly two frames after
+    // mount (useOwnSize, whose own tests cover the rest).
+    it('measures its viewport when the first layout never arrives', () => {
+      const frames: FrameRequestCallback[] = []
+      const raf = jest.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => frames.push(callback))
+      mount()
+      const viewport = screen.getByTestId('zoom')
+      Object.defineProperty(viewport, 'offsetWidth', { configurable: true, value: 300 })
+      Object.defineProperty(viewport, 'offsetHeight', { configurable: true, value: 200 })
+      expect(lastPinchConfig.enabled).toBe(false)
+      act(() => {
+        while (frames.length) frames.shift()?.(0)
+      })
+      raf.mockRestore()
+      expect(lastPinchConfig.enabled).toBe(true)
+      expect(lastPanConfig.enabled).toBe(true)
+      pinch(2, 150, 100)
+      pan(100, 1000)
+      expect(translateX()).toBe(150) // (600 - 300) / 2
+    })
   })
 })
