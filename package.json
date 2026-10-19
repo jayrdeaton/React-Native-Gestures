@@ -1,6 +1,6 @@
 {
   "name": "@rific/gestures",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Shared gestures for React Native apps: SwipeToDismiss, a view swiped or flicked away sideways (or off an edge) that follows the finger, and pinch-to-zoom (usePinchZoom, PinchZoomView) about the point between the fingers, clamped to the content's edges, both measured in their own coordinates",
   "keywords": [
     "react-native",
