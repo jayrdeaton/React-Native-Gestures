@@ -1,2 +1,5 @@
+export { type PinchZoomHandle, PinchZoomView, type PinchZoomViewProps } from './PinchZoomView'
 export { SWIPE_DISMISS_FRACTION, SWIPE_EDGE_DISMISS_FRACTION, SWIPE_EDGE_RESISTANCE, SWIPE_EXIT_FACTOR, SWIPE_FLING_MIN_DISTANCE, SWIPE_FLING_VELOCITY, SWIPE_VELOCITY_SMOOTHING, SWIPE_VELOCITY_STALE_MS } from './swipe'
 export { SWIPE_ACTIVE_OFFSET, SWIPE_EXIT_MS, SwipeToDismiss, type SwipeToDismissHandle, type SwipeToDismissProps } from './SwipeToDismiss'
+export { type PinchZoom, type PinchZoomOptions, usePinchZoom } from './usePinchZoom'
+export { ZOOM_MAX_SCALE, ZOOM_MIN_SCALE, ZOOM_PAN_MIN_DISTANCE, ZOOM_RESET_MS } from './zoom'

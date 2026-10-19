@@ -1,10 +1,11 @@
 import { callWorkletCallback, useWorkletCallback } from '@rific/core'
-import { type ReactNode, type Ref, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { type LayoutChangeEvent, Platform, type StyleProp, useWindowDimensions, View, type ViewStyle } from 'react-native'
+import { type ReactNode, type Ref, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { type LayoutChangeEvent, type StyleProp, useWindowDimensions, View, type ViewStyle } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { Extrapolation, interpolate, type SharedValue, useAnimatedReaction, useAnimatedStyle, useDerivedValue, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 
+import { useSwallowClick } from './swallowClick'
 import { releaseVelocity, sampleVelocity, SWIPE_DISMISS_FRACTION, SWIPE_EDGE_DISMISS_FRACTION, swipeEdgeDrag, swipeExitTarget, swipeIsVertical, swipeShouldDismiss } from './swipe'
 
 /** How far a sideways-only swipe has to move sideways before it takes the touch, and how far up or down before it gives the touch up to a
@@ -209,21 +210,9 @@ export function SwipeToDismiss({ children, edge, onDismiss, ref, style, testID }
     [dismissed, gone, translateX, translateY]
   )
 
-  // On the web, the click that follows a swipe (pointer-up) is caught on its way down to the content and stopped, so it never reaches
-  // react-native-web's press handling, which listens at the document's root. A plain tap never activates the pan, so it presses as usual.
+  // On the web, the click that follows a swipe (pointer-up) is caught on its way down to the content and stopped (see swallowClick.ts).
   const wrapperRef = useRef<View>(null)
-  useEffect(() => {
-    const node = wrapperRef.current as unknown as HTMLElement | null
-    if (Platform.OS !== 'web' || !node?.addEventListener) return
-    const swallow = (event: Event) => {
-      if (!swallowClick.get()) return
-      swallowClick.set(false)
-      event.stopPropagation()
-      event.preventDefault()
-    }
-    node.addEventListener('click', swallow, true)
-    return () => node.removeEventListener('click', swallow, true)
-  }, [swallowClick])
+  useSwallowClick(wrapperRef, swallowClick)
 
   // The swipe's state is stable, so the gesture is only rebuilt when the view's size, edge, clearance or whether it's on changes, never as a
   // swipe updates.
