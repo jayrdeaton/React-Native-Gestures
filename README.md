@@ -51,7 +51,20 @@ The content stays mounted after `onDismiss` until the app removes it (usually at
 
 A swipe can't be reached by a screen reader, so keep another way to do the same thing (a delete button, an accessibility action).
 
-The thresholds are exported (`SWIPE_DISMISS_FRACTION`, `SWIPE_FLING_VELOCITY`, ...) for anything that wants to match them.
+The thresholds are exported for anything that wants to match them:
+
+| Constant | Value | |
+|---|---|---|
+| `SWIPE_DISMISS_FRACTION` | `0.3` | A sideways swipe past this fraction of the view's width dismisses it. |
+| `SWIPE_EDGE_DISMISS_FRACTION` | `0.5` | A swipe toward `edge` past this fraction of the view's height dismisses it. |
+| `SWIPE_FLING_VELOCITY` | `500` | A flick at least this fast (pt/s, moving the way it was swiped) dismisses however short it was... |
+| `SWIPE_FLING_MIN_DISTANCE` | `12` | ...once it has moved this far (pt), so a tap's jitter never counts as one. |
+| `SWIPE_VELOCITY_SMOOTHING` | `0.6` | How much of each new sample's speed the running velocity takes (a moving average), so one uneven step can't make or break a flick. |
+| `SWIPE_VELOCITY_STALE_MS` | `80` | A pointer held still this long before it lifts was not flicked. |
+| `SWIPE_EDGE_RESISTANCE` | `0.2` | A drag away from `edge` moves the view this fraction of the way. |
+| `SWIPE_EXIT_FACTOR` | `1.5` | A dismissed view flies out to this multiple of the distance that clears it. |
+| `SWIPE_ACTIVE_OFFSET` | `10` | How far (pt) a sideways-only swipe moves sideways before it takes the touch, or up or down before it leaves the touch to the scroll view. |
+| `SWIPE_EXIT_MS` | `180` | How long a dismissed view takes to fly out. |
 
 ## Pinch to zoom
 
