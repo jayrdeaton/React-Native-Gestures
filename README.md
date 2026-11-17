@@ -158,3 +158,7 @@ Requires `react-native-reanimated` 4 or newer (with `react-native-worklets`) and
 ## License
 
 MIT
+
+---
+
+Made by [Infinite Token](https://www.infinitetoken.com), the team behind [Lumber](https://lumber.infinitetoken.com): end-to-end encrypted logging.
